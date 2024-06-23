@@ -17,14 +17,14 @@ The main developed source code resides in the `nnunetv2/training/nnUNetTrainer/c
 
 ### Transfer Learning and Fine-Tuning using nnUNet
 
-![Different strategies for transfer learning based on a pre-trained model](./figs/SDA.pdf)
+![Different strategies for transfer learning based on a pre-trained model](./figs/SDA.png)
 
 We presented four strategies (associated with models 5~8 in the above figure) for transfer learning or fine-tuning within nnUNet:
 
-- Train on segmentation-related layers only: `nnUNetTrainer_TL` in [nnUNetTrainer_TL](nnunetv2/training/nnUNetTrainer/customized/nnUNetTrainer_TL).
-- Fine-tune with a smaller learning rate over 300 epochs: `nnUNetTrainer_TL_FT_1en5_300epochs` in [nnUNetTrainer_TL](nnunetv2/training/nnUNetTrainer/customized/nnUNetTrainer_TL).
-- Fine-tune with a smaller learning rate over 300 epochs on the encoder only: `nnUNetTrainer_TL_FTen_1en5_300epochs` in [nnUNetTrainer_TL](nnunetv2/training/nnUNetTrainer/customized/nnUNetTrainer_TL).
-- Fine-tune with a smaller learning rate over 300 epochs on the decoder only: `nnUNetTrainer_TL_FTde_1en5_300epochs` in [nnUNetTrainer_TL](nnunetv2/training/nnUNetTrainer/customized/nnUNetTrainer_TL).
+- Train on segmentation-related layers only: `nnUNetTrainer_TL` in [nnUNetTrainer_TL](nnunetv2/training/nnUNetTrainer/customized/nnUNetTrainer_TL.py).
+- Fine-tune with a smaller learning rate over 300 epochs: `nnUNetTrainer_TL_FT_1en5_300epochs` in [nnUNetTrainer_TL](nnunetv2/training/nnUNetTrainer/customized/nnUNetTrainer_TL.py).
+- Fine-tune with a smaller learning rate over 300 epochs on the encoder only: `nnUNetTrainer_TL_FTen_1en5_300epochs` in [nnUNetTrainer_TL](nnunetv2/training/nnUNetTrainer/customized/nnUNetTrainer_TL.py).
+- Fine-tune with a smaller learning rate over 300 epochs on the decoder only: `nnUNetTrainer_TL_FTde_1en5_300epochs` in [nnUNetTrainer_TL](nnunetv2/training/nnUNetTrainer/customized/nnUNetTrainer_TL.py).
 
 ### DA-nnUNet
 
@@ -32,7 +32,7 @@ We presented four strategies (associated with models 5~8 in the above figure) fo
 
 To use DA-nnUNet, use the following example nnUNetTrainer:
 
-- DA-nnUNet training with 500 epochs and 4 convolutional layers in the domain classifier without deep supervision: `nnUNetTrainerDA_500ep_noDS_4Convs` in [nnUNetTrainer_DANN](nnunetv2/training/nnUNetTrainer/customized/nnUNetTrainer_DANN).
+- DA-nnUNet training with 500 epochs and 4 convolutional layers in the domain classifier without deep supervision: `nnUNetTrainerDA_500ep_noDS_4Convs` in [nnUNetTrainer_DANN](nnunetv2/training/nnUNetTrainer/customized/nnUNetTrainer_DANN.py).
 
 ### Usage Example
 
@@ -44,7 +44,7 @@ To train your model, run the following command:
 
 Explore these components to experiment with DA-nnUNet:
 
-- **Domain balanced dataloader:** Use `nnUNetDataLoader3D_Balanced` in [data_loader_3d_balanced](nnunetv2/training/dataloading) to balance inputs for the domain classifier in each batch.
+- **Domain balanced dataloader:** Use `nnUNetDataLoader3D_Balanced` in [data_loader_3d_balanced](nnunetv2/training/dataloading/data_loader_3d_balanced.py) to balance inputs for the domain classifier in each batch.
 - **Architecture:** Implementations for integrating the domain classifier into the nnUNet backbone are available in [unet_da](nnunetv2/training/nnUNetTrainer/customized/unet_da.py):
   - `PlainConvUNet_DA`: Domain classifier placed in the bottleneck of the UNet.
   - `PlainConvUNet_DAonDecoder`: Domain classifier placed in the decoder of the UNet.
