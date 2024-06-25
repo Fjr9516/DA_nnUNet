@@ -1,11 +1,11 @@
 # DA-nnUNet: Domain-adapted nnU-Net for Pediatric Tumor Segmentation
-<a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg"></a>
+<a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg"></a> [![arXiv](https://img.shields.io/badge/arXiv-2406.16848-b31b1b.svg)](https://arxiv.org/abs/2406.16848)
 
 Keywords: Unsupervised Domain Adaptation, Pediatric Tumor Segmentation, Gradient Reversal Layer
 
 This repository contains the source code accompanying the paper:
 
-"Unsupervised Domain Adaptation for Pediatric Brain Tumor Segmentation”
+Fu, Jingru, et al. "Unsupervised Domain Adaptation for Pediatric Brain Tumor Segmentation", 2024.
 
 ## Datasets
 
@@ -54,15 +54,18 @@ Explore these components to experiment with DA-nnUNet:
 We used the [official metrics](https://github.com/rachitsaluja/BraTS-2023-Metrics) provided by the BraTS 2023 challenge to evaluate our results.
 
 ## Results
-In our paper, we reported the mean and median DSC and HD95 metrics. Lesion-wise results are also available in the [`results`](results/UnsupervisedDA/) folder. We employed a [post-processing strategy](https://github.com/Precision-Medical-Imaging-Group/BraTS2023-inferCode/blob/main/postproc/postprocess.py) from the BraTS 2023 PET challenge winner to redefine the ET region using an optimal ET/WT ratio threshold of 1 (shown in the last row of the table below). The summarized Lesion-Wise (LW) metrics are shown below:
+In our paper, we reported the mean and median DSC and HD95 metrics. Lesion-wise results are also available in the [`results`](results/UnsupervisedDA/) folder. We employed a [post-processing strategy](https://github.com/Precision-Medical-Imaging-Group/BraTS2023-inferCode/blob/main/postproc/postprocess.py) (See code [here](postprocess_PED.py)) from the BraTS 2023 PET challenge winner to redefine the ET region using an optimal ET/WT ratio threshold of 1 (shown in the last row of the table below). The summarized Lesion-Wise (LW) metrics are shown below:
 ![Comparison of methods using Lesion-Wise Performance Metrics](./figs/LW_results.png)
 
 ## Citation
 If you find this code useful for your research, please consider citing:
 
-    @article{
-        xxx
-    }
+     @article{fu2024unsupervised,
+      title={Unsupervised Domain Adaptation for Pediatric Brain Tumor Segmentation},
+      author={Fu, Jingru and Bendazzoli, Simone and Smedby, {\"O}rjan and Moreno, Rodrigo},
+      journal={arXiv preprint arXiv:2406.16848},
+      year={2024}
+      }
 
     
 ## Acknowledgements
