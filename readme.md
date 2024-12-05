@@ -7,6 +7,15 @@ This repository contains the source code accompanying the paper:
 
 Fu, Jingru, et al. "Unsupervised Domain Adaptation for Pediatric Brain Tumor Segmentation", 2024.
 
+## Released Weights 🎉  
+
+We are excited to announce that the pre-trained weights are now available!  
+These weights enable researchers and practitioners to reproduce our results or fine-tune the models for their use cases.  
+
+You can download the weights from:  
+- **[DA-nnUNet v1.0 Weights](https://github.com/Fjr9516/DA_nnUNet/releases/tag/v1.0)**
+
+
 ## Datasets
 
 We utilized two datasets provided by the BraTS challenge organizers: the BraTS 2021 adult glioma dataset and the BraTS-PEDs 2023 dataset. If you need to convert datasets to nnU-Net style, refer to the example script provided [here](nnunetv2/dataset_conversion/Dataset140_BraTS23_PED.py).
