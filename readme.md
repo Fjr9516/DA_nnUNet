@@ -5,7 +5,7 @@ Keywords: Unsupervised Domain Adaptation, Pediatric Tumor Segmentation, Gradient
 
 This repository contains the source code accompanying the paper:
 
-Fu, Jingru, et al. "Unsupervised Domain Adaptation for Pediatric Brain Tumor Segmentation", 2024.
+Fu, Jingru, et al. "Unsupervised Domain Adaptation for Pediatric Brain Tumor Segmentation", ADSMI @ MICCAI 2024.
 
 ## Released Weights 🎉  
 
