@@ -43,6 +43,12 @@ To use DA-nnUNet, use the following example nnUNetTrainer:
 
 - DA-nnUNet training with 500 epochs and 4 convolutional layers in the domain classifier without deep supervision: `nnUNetTrainerDA_500ep_noDS_4Convs` in [nnUNetTrainer_DANN](nnunetv2/training/nnUNetTrainer/customized/nnUNetTrainer_DANN.py).
 
+To adapt DA-nnUNet to your specific problem, you may need to modify the following hard-coded parts:
+
+1. Specify Using `SimpleITKDomainIO` when preparing data: Update the configuration [here](https://github.com/Fjr9516/DA_nnUNet/blob/aa48c7b17a62e9393fe4f588e69042f9d3be6618/nnunetv2/imageio/simpleitk_domain_reader_writer.py#L42)
+
+2. Modify `nnUNetTrainerDA`: Adjust the target_domain and domain_mapping [nnUNetTrainer_DANN.py Lines 84-88](https://github.com/Fjr9516/DA_nnUNet/blob/aa48c7b17a62e9393fe4f588e69042f9d3be6618/nnunetv2/training/nnUNetTrainer/customized/nnUNetTrainer_DANN.py#L84)
+
 ### Usage Example
 
 To train your model, run the following command:
