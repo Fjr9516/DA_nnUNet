@@ -45,9 +45,19 @@ To use DA-nnUNet, use the following example nnUNetTrainer:
 
 To adapt DA-nnUNet to your specific problem, you may need to modify the following hard-coded parts:
 
-1. Specify Using `SimpleITKDomainIO` when preparing data: Update the configuration [here](https://github.com/Fjr9516/DA_nnUNet/blob/aa48c7b17a62e9393fe4f588e69042f9d3be6618/nnunetv2/imageio/simpleitk_domain_reader_writer.py#L42)
+1. Update the code [here](https://github.com/Fjr9516/DA_nnUNet/blob/aa48c7b17a62e9393fe4f588e69042f9d3be6618/nnunetv2/imageio/simpleitk_domain_reader_writer.py#L42). In this section, the domain is inferred from the filenames provided in the code.
 
 2. Modify `nnUNetTrainerDA`: Adjust the target_domain and domain_mapping [nnUNetTrainer_DANN.py Lines 84-88](https://github.com/Fjr9516/DA_nnUNet/blob/aa48c7b17a62e9393fe4f588e69042f9d3be6618/nnunetv2/training/nnUNetTrainer/customized/nnUNetTrainer_DANN.py#L84)
+
+Additionally, to correctly use the custom I/O reader (`SimpleITKDomainIO`), you need to specify the optional parameter in `dataset.json` as follows:
+
+```json
+{
+ "overwrite_image_reader_writer": "SimpleITKDomainIO"
+}
+```
+
+The `SimpleITKDomainIO` is needed to extract the domain information from the filename and inject it in the nnUNet `property`.
 
 ### Usage Example
 
