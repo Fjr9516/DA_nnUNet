@@ -304,7 +304,7 @@ class nnUNetTrainerDA(nnUNetTrainer):
                             [batch_domain] * len(self._get_deep_supervision_scales()))  # JR: change to self._get...
             else:
                 l_s = self.loss(output_S, target,
-                                [batch_domain])
+                                batch_domain)
             l_d = self.da_loss(output_D, batch_domain)
             ## SB: Computing DA Loss
             l = l_s + self.da_weight * l_d
@@ -362,7 +362,7 @@ class nnUNetTrainerDA(nnUNetTrainer):
                             [batch_domain] * len(self._get_deep_supervision_scales()))  # JR: change to self._get...
             else:
                 l_s = self.loss(output, target,
-                                [batch_domain])
+                                batch_domain)
             l_d = self.da_loss(output_D, batch_domain)
             ## SB: Computing DA Loss
             l = l_s + self.da_weight * l_d
@@ -685,6 +685,12 @@ class nnUNetTrainerDA_500epochs(nnUNetTrainerDA):
         super().__init__(plans, configuration, fold, dataset_json, unpack_dataset, device)
         self.num_epochs = 500
 
+class nnUNetTrainerDA_1000epochs(nnUNetTrainerDA):
+    def __init__(self, plans: dict, configuration: str, fold: int, dataset_json: dict, unpack_dataset: bool = True,
+                 device: torch.device = torch.device('cuda')):
+        super().__init__(plans, configuration, fold, dataset_json, unpack_dataset, device)
+        self.num_epochs = 1000
+
 # 1/ da_weight: to control strength of D in loss: default 1e-2
 class nnUNetTrainerDA_500ep_DAweight1(nnUNetTrainerDA_500epochs):
     def __init__(self, plans: dict, configuration: str, fold: int, dataset_json: dict, unpack_dataset: bool = True,
@@ -707,6 +713,12 @@ class nnUNetTrainerDA_500ep_DAweight100(nnUNetTrainerDA_500epochs):
 
 # or disenable deep supervision
 class nnUNetTrainerDA_500ep_noDS(nnUNetTrainerDA_500epochs):
+    def __init__(self, plans: dict, configuration: str, fold: int, dataset_json: dict, unpack_dataset: bool = True,
+                 device: torch.device = torch.device('cuda')):
+        super().__init__(plans, configuration, fold, dataset_json, unpack_dataset, device)
+        self.enable_deep_supervision = False
+
+class nnUNetTrainerDA_1000ep_noDS(nnUNetTrainerDA_1000epochs):
     def __init__(self, plans: dict, configuration: str, fold: int, dataset_json: dict, unpack_dataset: bool = True,
                  device: torch.device = torch.device('cuda')):
         super().__init__(plans, configuration, fold, dataset_json, unpack_dataset, device)
@@ -791,6 +803,75 @@ class nnUNetTrainerDA_500ep_DS_4Convs(nnUNetTrainerDA_500ep_noDS_4Convs):
         super().__init__(plans, configuration, fold, dataset_json, unpack_dataset, device)
         self.enable_deep_supervision = True
 
+class nnUNetTrainerDA_1000ep_noDS_4Convs(nnUNetTrainerDA_1000ep_noDS):
+    @staticmethod
+    def build_network_architecture(plans_manager: PlansManager,
+                                   dataset_json,
+                                   configuration_manager: ConfigurationManager,
+                                   num_input_channels,
+                                   enable_deep_supervision: bool = True) -> nn.Module:
+        num_stages = len(configuration_manager.conv_kernel_sizes)  # JR: 6
+
+        dim = len(configuration_manager.conv_kernel_sizes[0])  # JR: 3
+        conv_op = convert_dim_to_conv_op(dim)  # JR: nn.Conv3d
+
+        label_manager = plans_manager.get_label_manager(dataset_json)
+
+        segmentation_network_class_name = 'PlainConvUNet_DAonDecoder'  # JR: Need to specify here
+        mapping = {
+            'PlainConvUNet_DA': PlainConvUNet_DA,
+            'PlainConvUNet_DAonDecoder': PlainConvUNet_DAonDecoder,
+        }
+        kwargs = {
+            'PlainConvUNet_DA': {
+                'conv_bias': True,
+                'alpha': 0.,
+                'norm_op': get_matching_batchnorm(conv_op),
+                'norm_op_kwargs': {'eps': 1e-5, 'affine': True},
+                'dropout_op': None, 'dropout_op_kwargs': None,
+                'nonlin': nn.LeakyReLU, 'nonlin_kwargs': {'inplace': True},
+            },
+            'PlainConvUNet_DAonDecoder': {
+                'conv_bias': True,
+                'alpha': 0.,
+                'norm_op': get_matching_batchnorm(conv_op),
+                'norm_op_kwargs': {'eps': 1e-5, 'affine': True},
+                'dropout_op': None, 'dropout_op_kwargs': None,
+                'nonlin': nn.LeakyReLU, 'nonlin_kwargs': {'inplace': True},
+                'on_ith_decoder': 4,  # can be 1, 2, 3, 4
+                'num_convblock_domain_classifier': 4,
+            }
+        }
+        assert segmentation_network_class_name in mapping.keys(), 'The network architecture specified by the plans file ' \
+                                                                  'is non-standard (maybe your own?). Yo\'ll have to dive ' \
+                                                                  'into either this ' \
+                                                                  'function (get_network_from_plans) or ' \
+                                                                  'the init of your nnUNetModule to accommodate that.'
+        network_class = mapping[segmentation_network_class_name]
+
+        conv_or_blocks_per_stage = {
+            'n_conv_per_stage'
+            if network_class != ResidualEncoderUNet else 'n_blocks_per_stage': configuration_manager.n_conv_per_stage_encoder,
+            'n_conv_per_stage_decoder': configuration_manager.n_conv_per_stage_decoder
+        }
+        # network class name!!
+        model = network_class(
+            input_channels=num_input_channels,
+            n_stages=num_stages,
+            features_per_stage=[min(configuration_manager.UNet_base_num_features * 2 ** i,
+                                    configuration_manager.unet_max_num_features) for i in range(num_stages)],
+            conv_op=conv_op,
+            kernel_sizes=configuration_manager.conv_kernel_sizes,
+            strides=configuration_manager.pool_op_kernel_sizes,
+            num_classes=label_manager.num_segmentation_heads,
+            deep_supervision=enable_deep_supervision,
+            **conv_or_blocks_per_stage,
+            **kwargs[segmentation_network_class_name]
+        )
+        model.apply(InitWeights_He(1e-2))
+        if network_class == ResidualEncoderUNet:
+            model.apply(init_last_bn_before_add_to_0)
+        return model
 
 # 5/ other architecture
 class nnUNetTrainerDA_500ep_onEncoder(nnUNetTrainerDA_500epochs):
